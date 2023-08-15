@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 
 const MyProfile = mongoose.Schema({
-  profileImage:{
-     data : Buffer,
-     contentType:String
-  },
+  // profileImage:{
+  //    data : Buffer,
+  //    contentType:String
+  // },
   ownerName: {
     type: String,
     required: true,

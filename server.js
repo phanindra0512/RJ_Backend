@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const BrandName = require("./schemas/model");
 const MyProfile = require("./schemas/createProfile");
+const Products = require("./schemas/addProducts");
 
 const app = express();
 app.use(express.json());
@@ -54,8 +55,8 @@ app.delete("/deletebrand/:id", async (req, res) => {
   }
 });
 
-app.post("/createprofile", async (req, res) => {
-  const {  ownerName, emailId, mobile, storeName, storeAddress } = req.body;
+app.post("/createProfile", async (req, res) => {
+  const { ownerName, emailId, mobile, storeName, storeAddress } = req.body;
   console.log("BODY ===>", req.body);
   try {
     // if (!ownerName || !emailId) {
@@ -72,34 +73,95 @@ app.post("/createprofile", async (req, res) => {
       storeAddress,
     });
     await myData.save();
-    return res.json(await MyProfile.find());
+    // return res.json(await MyProfile.find());
+    res.status(200).json({
+      statusCode: 200,
+      message: "Profile created successfully.",
+      data: myData,
+    });
   } catch (err) {
-    console.log("error ===> ",err.message);
+    console.log("error ===> ", err.message);
     res.json(err);
   }
 });
 
-app.get("/getmyprofile", async (req, res) => {
+app.get("/getProfile", async (req, res) => {
   try {
-    const myData = await MyProfile.find();
-    return res.json(myData);
+    const allData = await MyProfile.find();
+    return res.json(allData);
   } catch (err) {
     console.log(err.message);
   }
 });
 
+app.get("/getProfile/:id", async (req, res) => {
+  try {
+    const data = await MyProfile.findById(req.params.id);
+    return res.json(data);
+  } catch (err) {
+    console.log(err.message);
+    res.send("<h1>ID not found</h1>");
+  }
+});
+
+app.post("/addProducts", async (req, res) => {
+  console.log("ADD products BODY ===>", req.body);
+
+  const {
+    productImage,
+    productName,
+    productSize,
+    productQuantity,
+    productPrice,
+    productDescription,
+  } = req.body;
+
+  try {
+    const myData = new Products({
+      productImage,
+      productName,
+      productSize,
+      productQuantity,
+      productPrice,
+      productDescription,
+    });
+    await myData.save();
+    res.status(200).json({
+      statusCode: 200,
+      message: "Product added successfully.",
+      data: myData,
+    });
+  } catch (err) {
+    console.log("error ===> ", err.message);
+    res.json(err);
+  }
+});
+
+
+app.get("/getProducts", async (req, res) => {
+  try {
+    const allData = await Products.find();
+    return res.json(allData);
+  } catch (err) {
+    console.log(err.message);
+  }
+});
+
+app.get("/getProducts/:id", async (req, res) => {
+  try {
+    const data = await Products.findById(req.params.id);
+    return res.json(data);
+  } catch (err) {
+    console.log(err.message);
+    res.send("<h1>ID not found</h1>");
+  }
+});
+
+
 app.get("/", (req, res) => {
   res.send("<h1>Hello world!!!</h1>");
 });
-function errorHandler(err, req, res, next) {
-  if (err instanceof multer.MulterError) {
-    res.json({
-      success: 0,
-      message: err.message,
-    });
-  }
-}
-app.use(errorHandler);
+
 app.listen(7000, () => console.log("server running"));
 
 // app.listen(7000, "192.168.1.20", () => console.log("server running"));
